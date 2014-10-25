@@ -1,40 +1,122 @@
 %{
 #include <stdio.h>
+
+typedef struct symbolRow symbol;
+struct symbolRow
+{
+	unsigned int symbolIndex;
+	char* symbolName;
+	unsigned int symbolValue;
+	struct symbolRow* next;
+};
+
+symbol* symbolTableTop = 0;
+unsigned int symbolTableSize = 0;
+
+unsigned int check_ID(char *token);
+void add_to_symbol_table(char *token); 
+
 %}
 
-%token ID, NUM, TRUE, FALSE
+%token ID NUM TRUE FALSE
 
 %%
 
 /* Grammar */
-id {letter}({letter}|{digit})*
-num {digit}+
+Prog: block 
+	;
 
-Prog {block}
+block: '{'decls stmts'}'
+	;
 
-block \{{decls}{stmts}\}
+decls: decls decl
+	;
 
-decls {decls}{whiteSpace}{whiteSpace}*{decl}|{whilespace}
+decl: 'b''a''s''i''c' ID';' {add_to_symbol_table(ID); print (“DCL %s”, ID)}
+	;
 
-decl basic{whiteSpace}{whiteSpace}*{id};
+stmts: stmts stmt
+	;
 
-stmts {stmts}{whiteSpace}*{stmt}|{whilespace}
+stmt: ID{ check_ID(ID); printf (“LValue %s”, ID); }'='bool';'{ printf("Assign"); } 
+	|'w''r''i''t''e' ID';'
+	;
 
-stmt {id}{whiteSpace}*={whiteSpace}{bool};|write{whiteSpace}*{id};
+bool: bool'|''|'join { printf("Or"); }
+	|join
+	;
 
-bool {bool}{join}|{join}
+join: join'&''&'equality { printf("And"); }
+	|equality
+	;
 
-join {join}\&\&{equality}
+equality: equality'=''='rel { printf("Equal"); }
+	|equality'!''='rel {printf("NotEqal"); }
+	|rel
+	;
 
-equality {equality}=={rel}|{equality}!={rel}|{rel}
+rel: expr'<'expr { printf("LessThan"); }
+	|expr'<''='expr { printf("LessEq"); }
+	|expr'>'expr { printf("GreaterThan"); }
+	|expr'>''='expr { printf("GreaterEq"); }
+	|expr
+	;
 
-rel {expr}{whiteSpace}*<{whiteSpace}*{expr}|{expr}{whiteSpace}*<={whiteSpace}*{expr}|{expr}{whiteSpace}*>{whiteSpace}*{expr}|{expr}{whiteSpace}*>={whiteSpace}*{expr}|{expr}
+expr: expr'+'term { printf("Add"); }
+	|expr'-'term { printf("Sub"): }
+	|term
+	;
 
-expr {expr}\+{term}|{expr}\-{term}|{term}
+term: term'*'unary { printf("Mult"); }
+	|term'/'unary { printf("Div"); }
+	|unary
+	;
 
-term {term}\*{unary}|{term}/{unary}|{unary}
+unary: '!'unary { printf("Not"); }
+	|'-'unary { printf("Negate"); }
+	|factor
+	;
 
-unary \!{unary}|\-{unary}|{factor}
+factor: '('bool')'
+	|ID { check_ID(ID); printf("RValue %s", ID); }
+	|NUM { printf("Push %s", NUM); }
+	|TRUE { printf("Push true"); }
+	|FALSE { printf("Push false"); }
+	;
 
-factor ({bool})|{id}|{num}|{true}|{false}
+%%
 
+
+void main() {
+	yyparse();
+}
+
+
+id add_to_symbol_table(char *token)
+{
+	//Get symbolName
+	char* symbolName = token+5;
+	symbol* ptr = (symbol*) malloc(sizeof(symbol));
+	ptr->next = symbolTableTop;
+	symbolTableTop = ptr;
+
+	ptr->symbolIndex = ++symbolTableSize;
+	ptr->symbolName = symbolName;
+	ptr->next = 0;
+	ptr->symbolValue = 0;
+
+	printf("DCL %s", symbolName);
+}
+unsigned int check_ID(char *token)
+{
+	//for debug
+	printf("ID CHECKING");
+	symbol* ptr;
+	for(ptr = symbolTableTop; ptr->symbolName != token && ptr != 0; ptr = ptr->next)
+	//for debug
+	//printf("SymbolData: Index=%d, Name=%s, Value=%d, Next=%p", ptr->symbolIndex, ptr->symbolName, ptr->symbolValue, ptr->next);
+	if(ptr)
+		return ptr->symbolValue;
+	else
+		return 0;
+}
