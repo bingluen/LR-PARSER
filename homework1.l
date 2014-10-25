@@ -13,18 +13,8 @@ struct symbolRow
 	struct symbolRow* next;
 };
 
-enum {
-	lookUP = 0,
-	ID,
-	NUM,
-	BTRUE,
-	BFALSE
-};
-
 symbol* symbolTableTop = 0;
 unsigned int symbolTableSize = 0;
-
-int tokenType = 0;
 
 unsigned int check_ID(char *token);
 void add_to_symbol_table(char *token); 
@@ -40,48 +30,12 @@ true [tT][rR][uU][eE]
 false [f|F][a|A][l|L][s|S][e|E]
 whiteSpace [ \t]
 
-/* grammar */
-id {letter}({letter}|{digit})*
-num {digit}+
-
-Prog {block}
-
-block \{{decls}{stmts}\}
-
-decls {decls}{whiteSpace}{whiteSpace}*{decl}|{whilespace}
-
-decl basic{whiteSpace}{whiteSpace}*{id};
-
-stmts {stmts}{whiteSpace}*{stmt}|{whilespace}
-
-stmt {id}{whiteSpace}*={whiteSpace}{bool};|write{whiteSpace}*{id};
-
-bool {bool}{join}|{join}
-
-join {join}\&\&{equality}
-
-equality {equality}=={rel}|{equality}!={rel}|{rel}
-
-rel {expr}{whiteSpace}*<{whiteSpace}*{expr}|{expr}{whiteSpace}*<={whiteSpace}*{expr}|{expr}{whiteSpace}*>{whiteSpace}*{expr}|{expr}{whiteSpace}*>={whiteSpace}*{expr}|{expr}
-
-expr {expr}\+{term}|{expr}\-{term}|{term}
-
-term {term}\*{unary}|{term}/{unary}|{unary}
-
-unary \!{unary}|\-{unary}|{factor}
-
-factor ({bool})|{id}|{num}|{true}|{false}
-
 %%
 
-basic{whiteSpace}*{id} { add_to_symbol_table(yytext);}
-
-
-
-{true} {tokenType = BTRUE; factorF(yytext); }
-{false} {tokenType = BFALSE;factorF(yytext); }
-{id} { tokenType = ID; factorF(yytext); }
-{num} { tokenType = NUM; factorF(yytext); }
+{true} { factorF(yytext); }
+{false} { factorF(yytext); }
+{id} { factorF(yytext); }
+{num} { factorF(yytext); }
 
 %%:
 
