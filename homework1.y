@@ -11,9 +11,9 @@ struct symbolRow
 };
 
 symbol* symbolTableTop = 0;
-unsigned int symbolTableSize = 0;
+int symbolTableSize = 0;
 
-unsigned int check_ID(char *token);
+int check_ID(char *token);
 void add_to_symbol_table(char *token); 
 
 %}
@@ -26,13 +26,13 @@ void add_to_symbol_table(char *token);
 Prog: block 
 	;
 
-block: '{'decls stmts'}'
+block: '{' decls stmts '}'
 	;
 
 decls: decls decl
-	;
+	|;
 
-decl: 'b''a''s''i''c' ID';' {add_to_symbol_table(ID); print (“DCL %s”, ID)}
+decl: 'b''a''s''i''c'' 'ID';' {add_to_symbol_table(ID); print (“DCL %s”, ID)}
 	;
 
 stmts: stmts stmt
@@ -86,13 +86,16 @@ factor: '('bool')'
 
 %%
 
+extern FILE *yyin
 
 void main() {
-	yyparse();
+	do {
+		yyparse();
+	} while(!feof(yyin));
 }
 
 
-id add_to_symbol_table(char *token)
+void add_to_symbol_table(char *token)
 {
 	//Get symbolName
 	char* symbolName = token+5;
@@ -107,7 +110,9 @@ id add_to_symbol_table(char *token)
 
 	printf("DCL %s", symbolName);
 }
-unsigned int check_ID(char *token)
+
+
+int check_ID(char *token)
 {
 	//for debug
 	printf("ID CHECKING");

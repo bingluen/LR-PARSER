@@ -3,15 +3,9 @@
 
 #include "y.tab.h"
 
-void factorF(char *token);
+int factorF();
 
-enum {
-	LOOKUP = 0,
-	NUM,
-	ID,
-	TRUE,
-	FALSE
-};
+#define LOOKUP = 0;
 
 int state;
 
@@ -28,14 +22,16 @@ num {digit}+
 
 %%
 
-\n { state = LOOKUP; }
+[\n\t ] { state = LOOKUP; }
 
 
-{true} { state = TRUE; factorF(yytext); }
-{false} { state = FALSE; factorF(yytext); }
-{id} { state = ID; factorF(yytext); }
-{num} { state = NUM; factorF(yytext); }
+{true} { state = TRUE; }
+{false} { state = FALSE; }
+{id} { state = ID; }
+{num} { state = NUM; }
 
+
+[a-zA-Z0-9]+ { factorF(); }
 
 %%:
 
@@ -46,7 +42,7 @@ void main()
 }
 
 
-void factorF(char *token)
+int factorF()
 {
 	//for Debug
 
