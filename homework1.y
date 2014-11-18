@@ -22,7 +22,7 @@ stmts:	stmts stmt
 	|
 	;
 
-stmt:	ID '=' bool';'
+stmt:	ID'='bool';'
 	|	'w''r''i''t''e'' 'ID';'
 	;
 
@@ -69,3 +69,8 @@ factor:	'('bool')'
 
 %%
 
+void main() {
+	do {
+		yyparse();
+	while(!eof(yyin));
+}

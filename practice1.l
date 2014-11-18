@@ -1,35 +1,28 @@
 %{
-#include <stdio.h>
 #include "y.tab.h"
+extern int yylval;
 
-int state;
 %}
 
-/* regular expression */
-
+/* Regular Expression */
 letter [a-zA-Z]
 digit [0-9]
 
 id {letter}({letter}|{digit})*
 num {digit}+
-false [f][a][l][s][e]
-true [t][r][u][e]
 
 %%
-
-{false} { return FALSE; }
-{true} { return TRUE;}
 
 {id} { return ID; }
 {num} { return NUM; }
+[\n\t ]
 
 %%
-
-yywrap() {
-	return 1;
-}
 
 void yyerror (char *s) {
     fprintf (stderr, "%s\n", s);
 }
 
+int yywrap() {
+	return 1;
+}
