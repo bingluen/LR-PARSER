@@ -6,11 +6,18 @@ int numLine = 1;
 /* Regular Expression */
 letter [a-zA-Z]
 digit [0-9]
+write [w][r][i][t][e]
+basic [b][a][s][i][c]
+true [t][r][u][e]
+false [f][a][l][s][e]
 
 id {letter}({letter}|{digit})*
 
 %%
-
+{basic} { return BASIC; }
+{write} { return WRITE; }
+{true} { return TRUE; }
+{false} { return FALSE; }
 {id} { yylval.String = strdup(yytext); return ID; }
 {digit}+ { yylval.Integer = atoi(yytext); return NUM; }
 [\n] { numLine++; }
@@ -21,9 +28,17 @@ id {letter}({letter}|{digit})*
 [=][=] { return EQUAL; }
 [!][=] { return NOTEQUAL; }
 [=] { return ASSIGN; }
+[&][&] { return AND; }
+[|][|] { return OR; }
 [-] { return SUB; }
 [+] { return ADD; }
+[*] { return MULT; }
+[/] { return DIV; }
 [!] { return NOT; }
+[;] { return SEM; }
+[{] { return BLEFT; }
+[}] { return BRIGHT; }
+
 
 %%
 
