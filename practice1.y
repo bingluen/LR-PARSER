@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* subroutine */
@@ -13,17 +14,19 @@ struct symbol {
 	struct symbol* next;
 };
 
-struct {
+struct symTab{
 	int symNum;
 	struct symbol* table;
-} symbolTable;
+};
 
 /* init symbolTable */
 
-symbolTable.symNum = 0;
-symbolTable.table = 0;
+struct symTab symbolTable = {.symNum = 0, .table = 0};
 
 extern numLine;
+
+/* global flag */
+int dclFlag = 0;
 %}
 
 %union{
@@ -49,7 +52,7 @@ Decls:	Decls Decl
 	|
 	;
 
-Decl:	BASIC ID SEM { insertToSymbolTable($2);  printf("DCL %s;\n", $2); }
+Decl:	BASIC ID SEM { insertToSymbolTable($2);  if(!dclFlag) printf("DCL %s;\n", $2);  dclFlag = 0;}
 
 Stmts:	Stmts Stmt
 	|
@@ -138,7 +141,8 @@ void insertToSymbolTable (char* id)
 
 	if(flag == 1)
 	{
-		printf("**** Error on line %d : Identifier '%s' is re-declared!!.\n\tThe declaraction statement will be ignored.", numLine, id);
+		dclFlag = 1;
+		printf("**** Error on line %d : Identifier '%s' is re-declared!!.\n\tThe declaraction statement will be ignored.\n", numLine, id);
 	}
 	else
 	{
@@ -154,8 +158,9 @@ void insertToSymbolTable (char* id)
 			//go to end
 			struct symbol* ptr;
 			int j;
-			for(j = 0, ptr = symbolTable.table; j < symbolTable.symNum; j++, ptr = ptr->next);
-			ptr = malloc(sizeof(struct symbol));
+			for(j = 0, ptr = symbolTable.table; j < symbolTable.symNum - 1; j++, ptr = ptr->next);
+			ptr->next = malloc(sizeof(struct symbol));
+			ptr = ptr->next;
 			ptr->symbol = id;
 			ptr->idsn = symbolTable.symNum;
 			ptr->next = 0;
@@ -194,7 +199,8 @@ void checkID(char* id)
 	
 	if(flag == 0)
 	{
-		printf("**** Error on line %d : Identifier '%s' is NOT declared!!.", numLine, id);
-
+		printf("**** Error on line %d : Identifier '%s' is NOT declared!!.\n", numLine, id);
+		printf("**** ABORT\n");
+		exit(1);
 	}
 }
