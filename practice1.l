@@ -38,7 +38,8 @@ id {letter}({letter}|{digit})*
 [;] { return SEM; }
 [{] { return BLEFT; }
 [}] { return BRIGHT; }
-
+[(] { return SLEFT; }
+[)] { return SRIGHT; }
 
 %%
 

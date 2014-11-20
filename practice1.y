@@ -34,7 +34,7 @@ int dclFlag = 0;
 	int Integer;
 }
 
-%token LESS LESSEQUAL GREATER GREATEREQUAL ADD SUB MULT DIV NOT NOTEQUAL ASSIGN EQUAL AND OR SEM WRITE BASIC BLEFT BRIGHT TRUE FALSE
+%token LESS LESSEQUAL GREATER GREATEREQUAL ADD SUB MULT DIV NOT NOTEQUAL ASSIGN EQUAL AND OR SEM WRITE BASIC BLEFT BRIGHT TRUE FALSE SLEFT SRIGHT
 
 %token <String> ID
 %token <Integer> NUM
@@ -98,7 +98,8 @@ Unary:	NOT Unary { printf("Not\n"); }
 	|	Factor
 	;
 
-Factor:	ID	{ checkID($1); printf("RValue %s\n", $1);  }
+Factor:	SLEFT bool SRIGHT
+	|	ID	{ checkID($1); printf("RValue %s\n", $1);  }
 	|	NUM	{ printf("Push %d\n", $1); }
 	|	TRUE	{ printf("Push true\n"); }
 	|	FALSE	{ printf("Push false\n"); }
