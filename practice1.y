@@ -2,41 +2,55 @@
 #include <stdio.h>
 %}
 
-%token ID NUM
+%union{
+	char* String;
+	int Integer;
+}
+
+%token LESS LESSEQUAL GREATER GREATEREQUAL ADD SUB MULT DIV NOT NOTEQUAL ASSIGN EQUAL
+
+%token <String> ID
+%token <Integer> NUM
 
 %%
 
-rel:	expr'<'expr
-	|	expr'<''='expr
-	|	expr'>'expr
-	|	expr'>''='expr
-	|	expr
+Prog:	Equality
+	|
 	;
 
-expr:	expr'+'term
-	|	expr'-'term
-	|	term
+Equality:Equality EQUAL Rel { printf("Equal"); }
+	|	Equality NOTEQUAL Rel { printf("NotEqual"); }
+	|	Rel
 	;
 
-term:	term'*'unary
-	|	term'/'unary
-	|	unary
+Rel:	Expr LESS Expr { printf("LessThan"); }
+	|	Expr LESSEQUAL Expr { printf("LessEq"); }
+	|	Expr GREATER Expr { printf("GreaterThan"); }
+	|	Expr GREATEREQUAL Expr { printf("GreaterEq"); }
+	|	Expr
 	;
 
-unary:	'!'unary
-	|	'-'unary
-	|	factor
+Expr:	Expr ADD Term { printf("Add"); }
+	|	Expr SUB Term { printf("Sub"); }
+	|	Term
 	;
 
-factor:	ID	{ printf("input is ID"); }
-	|	NUM	{ printf("input is NUM"); }
+Term:	Term MULT Unary { printf("Mult"); }
+	|	Term DIV Unary { printf("Div"); }
+	|	Unary
+	;
+
+Unary:	NOT Unary { printf("Not"); }
+	|	SUB Unary { printf("Negate"); }
+	|	Factor
+	;
+
+Factor:	ID	{ /* printf("%s", $1); */ }
+	|	NUM	{ /* printf("%d", $1); */ }
 	;
 
 %%
 
-int main() {
-	do {
-		yyparse();
-	}while(1);
-	return 0;
+main(){
+	yyparse();
 }

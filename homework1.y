@@ -2,67 +2,80 @@
 #include <stdio.h>
 %}
 
-%token NUM ID FALSE TRUE
+%token BASIC WRITE TRUE FALSE BLEFT BRIGHT SLEFT SRIGHT
+	AND OR NOT EQUAL NOTEQUAL LESS LESSEQUAL GREATER GREATEREQUAL
+	ADD SUB MULT DIV ASSIGN SEMICOLON WHITESPACE
+
+/* create variables */
+%union {
+	char* string;
+}
+
+/* define type of variables */
+%token <string> INTEGER
+%token <string> ID
+
 
 %%
 
 Prog:	block
 	;
 
-block:	'{'decls stmts'}'
+block:	BLEFT decls stmts BRIGHT
 	;
 
 decls:	decls decl
 	|
 	;
 
-decl:	'b''a''s''i''c'' 'ID';'
+decl:	BASIC ID
+	;
 
 stmts:	stmts stmt
 	|
 	;
 
-stmt:	ID'='bool';'
-	|	'w''r''i''t''e'' 'ID';'
+stmt:	ID ASSIGN bool
+	|	WRITE ID
 	;
 
-bool:	bool'|''|'join
+bool:	bool OR join
 	|	join
 	;
 
-join:	join'&''&'equality
+join:	join AND equality
 	;
 
-equality:equality'=''='rel
-	|	equality'!''='rel
+equality:equality EQUAL rel
+	|	equality NOTEQUAL rel
 	|	rel
 	;
 
-rel:	expr'<'expr
-	|	expr'<''='expr
-	|	expr'>'expr
-	|	expr'>''='expr
+rel:	expr LESS expr
+	|	expr LESSEQUAL expr
+	|	expr GREATER expr
+	|	expr GREATEREQUAL expr
 	|	expr
 	;
 
-expr:	expr'+'term
-	|	expr'-'term
+expr:	expr ADD term
+	|	expr SUB term
 	|	term
 	;
 
-term:	term'*'unary
-	|	term'/'unary
+term:	term MULT unary
+	|	term DIV unary
 	|	unary
 	;
 
-unary:	'!'unary
-	|	'-'unary
+unary:	NOT unary
+	|	SUB unary
 	|	factor
 	;
 
-factor:	'('bool')'
+factor:	SLEFT bool SRIGHT
 	|	ID	{ printf("ID"); }
-	|	NUM { printf("NUM"); }
+	|	INTEGER { printf("INTEGER"); }
 	|	TRUE{ printf("TRUE"); }
 	|	FALSE{ printf("FALSE"); }
 	;
@@ -70,7 +83,5 @@ factor:	'('bool')'
 %%
 
 void main() {
-	do {
 		yyparse();
-	while(!eof(yyin));
 }
