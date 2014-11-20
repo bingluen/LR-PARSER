@@ -1,0 +1,10 @@
+{
+basic A;
+basic B;
+basic C;
+A=3;
+B=4/5-(3+2);
+C= (true || false && a> B);
+write A; write B;
+write C;
+}

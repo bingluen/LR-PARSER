@@ -1,0 +1,6 @@
+{
+basic X;
+basic Asample;
+basic Y;
+Y=3; X= true && Y + 5 <= 4 * 2; write X;
+}

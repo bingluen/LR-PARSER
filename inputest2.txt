@@ -1,0 +1,8 @@
+{
+basic i;
+basic foo;
+basic ATooLongID;
+basic foo;
+foo= ATooLongID + Y;
+foo= i+1;
+}

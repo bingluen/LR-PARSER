@@ -1,0 +1,4 @@
+{ basic Bvar;basic I;
+I=100;
+Bvar = I+100== 200 !=false;
+write Bvar; }
