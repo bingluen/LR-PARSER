@@ -1,5 +1,29 @@
 %{
 #include <stdio.h>
+#include <string.h>
+
+/* subroutine */
+void insertToSymbolTable(char*);
+void checkID(char*);
+
+/* symbol table */
+struct symbol {
+	int idsn;
+	char* symbol;
+	struct symbol* next;
+};
+
+struct {
+	int symNum;
+	struct symbol* table;
+} symbolTable;
+
+/* init symbolTable */
+
+symbolTable.symNum = 0;
+symbolTable.table = 0;
+
+extern numLine;
 %}
 
 %union{
@@ -25,15 +49,15 @@ Decls:	Decls Decl
 	|
 	;
 
-Decl:	BASIC ID SEM { printf("DCL %s;\n", $2); }
+Decl:	BASIC ID SEM { insertToSymbolTable($2);  printf("DCL %s;\n", $2); }
 
 Stmts:	Stmts Stmt
 	|
 	;
 
-Stmt:	ID { printf("LValue %s;\n", $1); }
+Stmt:	ID { checkID(yylval.String);  printf("LValue %s;\n", $1); }
 	ASSIGN bool SEM { printf("Assign\n"); }
-	|	WRITE ID SEM { printf("Output %s\n", $2); }
+	|	WRITE ID SEM { checkID(yylval.String);  printf("Output %s\n", $2); }
 	;
 
 bool:	bool OR join { printf("Or\n"); }
@@ -71,7 +95,7 @@ Unary:	NOT Unary { printf("Not\n"); }
 	|	Factor
 	;
 
-Factor:	ID	{ printf("RValue %s\n", $1);  }
+Factor:	ID	{ checkID($1); printf("RValue %s\n", $1);  }
 	|	NUM	{ printf("Push %d\n", $1); }
 	|	TRUE	{ printf("Push true\n"); }
 	|	FALSE	{ printf("Push false\n"); }
@@ -81,4 +105,96 @@ Factor:	ID	{ printf("RValue %s\n", $1);  }
 
 main(){
 	yyparse();
+}
+
+void insertToSymbolTable (char* id)
+{
+	//check ID
+	int flag = 0; // 0 = not declared 1= declared
+	int i;
+	struct symbol *ptr;
+	for(i = 0, ptr = symbolTable.table; 
+		i < symbolTable.symNum; 
+		i++, ptr = ptr->next)
+	{
+		if(strlen(id) != strlen(ptr->symbol))
+		{
+			continue;
+		}
+		else
+		{
+			int j;
+			for(j = 0; 
+				j < strlen(ptr->symbol)
+			 	&& ptr->symbol[j] == id[j]; 
+				j++);
+			if(j == strlen(ptr->symbol))
+			{
+				flag = 1;
+				break;
+			}
+		}
+	}
+
+	if(flag == 1)
+	{
+		printf("**** Error on line %d : Identifier '%s' is re-declared!!.\n\tThe declaraction statement will be ignored.", numLine, id);
+	}
+	else
+	{
+		if(symbolTable.symNum == 0)
+		{
+			symbolTable.table = malloc(sizeof(struct symbol));
+			symbolTable.table->symbol = id;
+			symbolTable.table->idsn = symbolTable.symNum;
+			symbolTable.table->next = 0;
+		}
+		else
+		{
+			//go to end
+			struct symbol* ptr;
+			int j;
+			for(j = 0, ptr = symbolTable.table; j < symbolTable.symNum; j++, ptr = ptr->next);
+			ptr = malloc(sizeof(struct symbol));
+			ptr->symbol = id;
+			ptr->idsn = symbolTable.symNum;
+			ptr->next = 0;
+		}
+		symbolTable.symNum++;
+	}
+}
+
+void checkID(char* id)
+{
+	int flag = 0; // 0 = not declared 1= declared
+	int i;
+	struct symbol *ptr;
+	for(i = 0, ptr = symbolTable.table; 
+		i < symbolTable.symNum; 
+		i++, ptr = ptr->next)
+	{
+		if(strlen(id) != strlen(ptr->symbol))
+		{
+			continue;
+		}
+		else
+		{
+			int j;
+			for(j = 0; 
+				j < strlen(ptr->symbol)
+			 	&& ptr->symbol[j] == id[j]; 
+				j++);
+			if(j == strlen(ptr->symbol))
+			{
+				flag = 1;
+				break;
+			}
+		}
+	}
+	
+	if(flag == 0)
+	{
+		printf("**** Error on line %d : Identifier '%s' is NOT declared!!.", numLine, id);
+
+	}
 }
