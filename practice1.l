@@ -10,7 +10,7 @@ write [w][r][i][t][e]
 basic [b][a][s][i][c]
 true [t][r][u][e]
 false [f][a][l][s][e]
-
+whitespace [ ]
 id {letter}({letter}|{digit})*
 
 %%
@@ -18,6 +18,7 @@ id {letter}({letter}|{digit})*
 {write} { return WRITE; }
 {true} { return TRUE; }
 {false} { return FALSE; }
+{whitespace}+ {}
 {id} { yylval.String = strdup(yytext); return ID; }
 {digit}+ { yylval.Integer = atoi(yytext); return NUM; }
 [\n] { numLine++; }
