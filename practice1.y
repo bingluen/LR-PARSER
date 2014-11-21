@@ -113,6 +113,12 @@ main(){
 
 void insertToSymbolTable (char* id)
 {
+	if(strlen(id) > 8)
+	{	
+		printf("**** Error on line %d : Identifier '%s' is too leng. truncated into '", numLine, id);
+		id[8] = '\0';
+		printf("%s'.\n", id);
+	}
 	//check ID
 	int flag = 0; // 0 = not declared 1= declared
 	int i;
