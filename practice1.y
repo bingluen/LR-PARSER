@@ -178,6 +178,10 @@ void insertToSymbolTable (char* id)
 
 void checkID(char* id)
 {
+	if(strlen(id) > 8)
+	{		
+		id[8] = '\0';
+	}
 	int flag = 0; // 0 = not declared 1= declared
 	int i;
 	struct symbol *ptr;
